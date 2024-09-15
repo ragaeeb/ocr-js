@@ -1,5 +1,5 @@
 {
-    "name": "ocr-js",
+    "name": "@ragaeeb/ocr-js",
     "description": "Library to OCR documents using 3rd party libraries",
     "version": "1.0.0",
     "author": "Ragaeeb Haq",
