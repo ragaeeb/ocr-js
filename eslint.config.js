@@ -33,6 +33,7 @@ export default [
             ...tseslint.configs.recommended.rules,
             ...eslintConfigPrettier.rules,
             'no-console': 'off',
+            'no-explicit-any': 'off',
             'no-plusplus': 'off',
             'prettier/prettier': ['error'],
             radix: 'off',
