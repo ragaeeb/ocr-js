@@ -1,6 +1,15 @@
 # Table of Contents
 
-[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/3a066fab-d2d5-4d84-b881-c1adffbfcf52.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/3a066fab-d2d5-4d84-b881-c1adffbfcf52) ![GitHub](https://img.shields.io/github/license/ragaeeb/ocr-js) ![npm](https://img.shields.io/npm/v/@ragaeeb/ocr-js) ![npm](https://img.shields.io/npm/dm/ocr-js) ![GitHub issues](https://img.shields.io/github/issues/ragaeeb/ocr-js) ![GitHub stars](https://img.shields.io/github/stars/ragaeeb/ocr-js?style=social) ![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/ocr-js) [![codecov](https://codecov.io/gh/ragaeeb/ocr-js/graph/badge.svg?token=2YTE1LS8CC)](https://codecov.io/gh/ragaeeb/ocr-js) [![Size](https://deno.bundlejs.com/badge?q=@ragaeeb/ocr-js@1.0.0&badge=detailed)](https://bundlejs.com/?q=@ragaeeb/ocr-js%401.0.0) ![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
+[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/3a066fab-d2d5-4d84-b881-c1adffbfcf52.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/3a066fab-d2d5-4d84-b881-c1adffbfcf52)
+![GitHub](https://img.shields.io/github/license/ragaeeb/ocr-js)
+![npm](https://img.shields.io/npm/v/@ragaeeb/ocr-js)
+![npm](https://img.shields.io/npm/dm/ocr-js)
+![GitHub issues](https://img.shields.io/github/issues/ragaeeb/ocr-js)
+![GitHub stars](https://img.shields.io/github/stars/ragaeeb/ocr-js?style=social)
+![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/ocr-js)
+[![codecov](https://codecov.io/gh/ragaeeb/ocr-js/graph/badge.svg?token=2YTE1LS8CC)](https://codecov.io/gh/ragaeeb/ocr-js)
+[![Size](https://deno.bundlejs.com/badge?q=@ragaeeb/ocr-js@2.0.0&badge=detailed)](https://bundlejs.com/?q=@ragaeeb/ocr-js%402.0.0)
+![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
 
 The `ocr-js` project simplifies the process of performing OCR on documents sent to 3rd party services like Google Document AI.
 

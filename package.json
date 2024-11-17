@@ -1,7 +1,7 @@
 {
     "name": "@ragaeeb/ocr-js",
     "description": "Library to OCR documents using 3rd party libraries",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "author": "Ragaeeb Haq",
     "license": "MIT",
     "private": false,
@@ -29,32 +29,33 @@
         "ocr"
     ],
     "dependencies": {
-        "@google-cloud/documentai": "^8.9.0",
-        "@google-cloud/storage": "^7.12.1",
+        "@google-cloud/documentai": "^8.12.0",
+        "@google-cloud/storage": "^7.14.0",
+        "bitaboom": "^1.0.0",
         "p-queue": "^8.0.1"
     },
     "devDependencies": {
-        "@eslint/js": "^9.10.0",
-        "@parcel/packager-ts": "^2.12.0",
-        "@parcel/transformer-typescript-types": "^2.12.0",
+        "@eslint/js": "^9.15.0",
+        "@parcel/packager-ts": "^2.13.0",
+        "@parcel/transformer-typescript-types": "^2.13.0",
         "@semantic-release/changelog": "^6.0.3",
         "@semantic-release/git": "^10.0.1",
         "@types/eslint__js": "^8.42.3",
-        "@types/node": "^22.5.5",
-        "@vitest/coverage-v8": "^2.1.1",
-        "eslint": "^9.10.0",
+        "@types/node": "^22.9.0",
+        "@vitest/coverage-v8": "^2.1.5",
+        "eslint": "^9.15.0",
         "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-import": "^2.30.0",
-        "eslint-plugin-perfectionist": "^3.6.0",
+        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-perfectionist": "^3.9.1",
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-vitest": "^0.5.4",
         "eslint-plugin-vitest-globals": "^1.5.0",
-        "parcel": "^2.12.0",
+        "parcel": "^2.13.0",
         "prettier": "^3.3.3",
-        "semantic-release": "^24.1.1",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.6.2",
-        "typescript-eslint": "^8.5.0",
-        "vitest": "^2.1.1"
-    }
+        "semantic-release": "^24.2.0",
+        "typescript": "^5.6.3",
+        "typescript-eslint": "^8.14.0",
+        "vitest": "^2.1.5"
+    },
+    "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
 }
