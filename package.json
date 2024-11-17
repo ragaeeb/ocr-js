@@ -1,6 +1,6 @@
 {
     "name": "@ragaeeb/ocr-js",
-    "description": "Library to OCR documents using 3rd party libraries",
+    "description": "Library to OCR documents using 3rd party libraries focusing on Arabic texts",
     "version": "2.0.0",
     "author": "Ragaeeb Haq",
     "license": "MIT",
