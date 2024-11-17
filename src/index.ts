@@ -1,9 +1,13 @@
 import { DocumentProcessorServiceClient, protos } from '@google-cloud/documentai';
 import { Storage } from '@google-cloud/storage';
+import { promises as fs } from 'fs';
+import os from 'os';
 import PQueue from 'p-queue';
+import path from 'path';
 
-import { mapDocumentPage, stringToHash } from './textUtils';
-import { Config, Page, RequestOCROptions, RequestOCRResult } from './types';
+import { fileExists } from './io';
+import { mapDocumentToPage, stringToHash } from './textUtils';
+import { Config, DownloadOCROptions, OCRDataToPagesParams, Page, RequestOCROptions, RequestOCRResult } from './types';
 
 let config: Config;
 
@@ -19,35 +23,79 @@ export const generateRequestId = (pdfFile: string): string => {
     return `${stringToHash(pdfFile).toString()}_${Date.now().toString()}`;
 };
 
-export const getOCRResult = async (requestId: string): Promise<Page[]> => {
+export const isOCRFinished = async (requestId: string): Promise<boolean> => {
+    const [files] = await new Storage().bucket(config.bucketUri).getFiles({
+        prefix: `${requestId}/`,
+        maxResults: 1,
+    });
+
+    return files.length > 0;
+};
+
+export const downloadOCRResults = async (requestId: string, options: DownloadOCROptions = {}): Promise<string[]> => {
+    const { concurrency = 15, outputFolder } = options;
+    const outputDir = outputFolder || `${os.tmpdir()}/ocr-js/${requestId}`;
+    const results: string[] = [];
+
+    await fs.mkdir(outputDir, { recursive: true });
+
     const [files] = await new Storage().bucket(config.bucketUri).getFiles({
         prefix: `${requestId}/`,
     });
-    const queue = new PQueue({ concurrency: 15 });
+    const queue = new PQueue({ concurrency });
+    const tasks = files.map((fileInfo, index, arr) => async () => {
+        const fileName = path.basename(fileInfo.name);
+        const outputPath = path.join(outputDir, fileName);
+        const fileAlreadyDownloaded = await fileExists(outputPath);
 
-    const allPages: Page[] = [];
-    const tasks = files.map((fileInfo, index) => async () => {
-        const [file] = await fileInfo.download();
+        if (fileAlreadyDownloaded) {
+            if (config.logger) {
+                config.logger(`Skipping download for ${outputPath}`);
+            }
+        } else {
+            if (config.logger) {
+                config.logger(`Downloading file ${index + 1}/${arr.length}...`);
+            }
 
-        if (config.logger) {
-            config.logger(`Fetched file #${index + 1}:`);
+            const [file] = await fileInfo.download();
+
+            await fs.writeFile(outputPath, file);
+
+            if (config.logger) {
+                config.logger(`Downloaded file ${index + 1}/${arr.length} to ${outputPath}`);
+            }
         }
 
-        const document: protos.google.cloud.documentai.v1beta3.IDocument = JSON.parse(file.toString());
-        const { pages, text } = document;
-
-        const pageData: Page[] = (pages || []).map((page) => {
-            return mapDocumentPage(page, text as string);
-        });
-
-        allPages.push(...pageData);
+        results.push(outputPath);
     });
 
     await queue.addAll(tasks);
 
-    allPages.sort((a, b) => a.id - b.id);
+    if (config.logger) {
+        config.logger(`Download complete!`);
+    }
 
-    return allPages;
+    return results;
+};
+
+export const mapOCRDataToPages = async ({ directory, files, debug }: OCRDataToPagesParams): Promise<Page[]> => {
+    const pages: Page[] = [];
+    const filesToProcess = files || (await fs.readdir(directory)).map((file) => path.resolve(directory, file));
+
+    for (const file of filesToProcess) {
+        const {
+            pages: rawPages,
+            text,
+        }: { pages: protos.google.cloud.documentai.v1beta3.Document.IPage[]; text: string } = JSON.parse(
+            await fs.readFile(file, 'utf-8'),
+        );
+
+        pages.push(...rawPages.map((rawPage) => mapDocumentToPage(rawPage, text, debug)));
+    }
+
+    pages.sort((a, b) => a.id - b.id);
+
+    return pages;
 };
 
 export const requestOCR = async (pdfFile: string, options: RequestOCROptions): Promise<RequestOCRResult> => {

@@ -2,7 +2,7 @@
 import { protos } from '@google-cloud/documentai';
 import { formatStringBySentence } from 'bitaboom';
 
-import { Page } from './types';
+import { DebugHandler, Page } from './types';
 
 export const stringToHash = (text: string): number => {
     let hash = 0;
@@ -31,30 +31,6 @@ const getText = (
     return allText.substring(startIndex, endIndex as number).trim();
 };
 
-export const mapDocumentToPageByParagraphs = (
-    { pageNumber, paragraphs }: protos.google.cloud.documentai.v1beta3.Document.IPage,
-    allText: string,
-): Page => {
-    if (!paragraphs) {
-        return {
-            id: pageNumber as number,
-            text: '',
-        };
-    }
-
-    const bodies = paragraphs.map((paragraph) => {
-        return getText(
-            allText,
-            paragraph.layout?.textAnchor as protos.google.cloud.documentai.v1beta3.Document.ITextAnchor,
-        );
-    });
-
-    return {
-        id: pageNumber as number,
-        text: bodies.join('\n'),
-    };
-};
-
 type PageContentWithDimensions = {
     height: number;
     text: string;
@@ -62,9 +38,10 @@ type PageContentWithDimensions = {
 };
 
 const mapSegmentsToPageContentWithDimensions = (
-    { boundingPoly, textAnchor }: protos.google.cloud.documentai.v1beta3.Document.Page.ILayout,
+    layout: protos.google.cloud.documentai.v1beta3.Document.Page.ILayout,
     allText: string,
 ): PageContentWithDimensions => {
+    const { boundingPoly, textAnchor } = layout;
     const vertices =
         boundingPoly?.normalizedVertices as protos.google.cloud.documentai.v1beta3.INormalizedVertex[] as any;
     let width = 0;
@@ -83,8 +60,9 @@ const mapSegmentsToPageContentWithDimensions = (
 };
 
 export const mapDocumentToPage = (
-    { blocks, lines, pageNumber, paragraphs }: protos.google.cloud.documentai.v1beta3.Document.IPage,
+    { blocks, lines, pageNumber, paragraphs, tokens }: protos.google.cloud.documentai.v1beta3.Document.IPage,
     allText: string,
+    debug?: DebugHandler,
 ): Page => {
     const excerpts: PageContentWithDimensions[] = [];
 
@@ -97,7 +75,10 @@ export const mapDocumentToPage = (
                         allText,
                     ),
                 )
-                .map((block) => ({ ...block, text: formatStringBySentence(block.text) })),
+                .map((block) => ({
+                    ...block,
+                    text: formatStringBySentence(block.text),
+                })),
         );
     } else if (lines) {
         excerpts.push(
@@ -130,8 +111,25 @@ export const mapDocumentToPage = (
         .map(({ text }) => text)
         .join('\n');
 
-    return {
+    const page = {
         id: pageNumber as number,
         text: pageText,
     };
+
+    if (debug) {
+        debug({
+            ...page,
+            tokens: (tokens as protos.google.cloud.documentai.v1beta3.Document.Page.IBlock[]).map((token) => {
+                return {
+                    normalizedVertices: token.layout?.boundingPoly?.normalizedVertices,
+                    ...mapSegmentsToPageContentWithDimensions(
+                        token.layout as protos.google.cloud.documentai.v1beta3.Document.Page.ILayout,
+                        allText,
+                    ),
+                };
+            }),
+        });
+    }
+
+    return page;
 };
