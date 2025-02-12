@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { protos } from '@google-cloud/documentai';
 import { formatStringBySentence } from 'bitaboom';
 

@@ -1,11 +1,11 @@
-import { DocumentProcessorServiceClient, protos } from '@google-cloud/documentai';
+import { DocumentProcessorServiceClient } from '@google-cloud/documentai';
 import { Storage } from '@google-cloud/storage';
-import { promises as fs } from 'fs';
-import os from 'os';
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import PQueue from 'p-queue';
-import path from 'path';
 
-import { fileExists } from './io';
+import { fileExists, readOCRData, readRawFile } from './io';
 import { mapDocumentToPage, stringToHash } from './textUtils';
 import { Config, DownloadOCROptions, OCRDataToPagesParams, Page, RequestOCROptions, RequestOCRResult } from './types';
 
@@ -25,8 +25,8 @@ export const generateRequestId = (pdfFile: string): string => {
 
 export const isOCRFinished = async (requestId: string): Promise<boolean> => {
     const [files] = await new Storage().bucket(config.bucketUri).getFiles({
-        prefix: `${requestId}/`,
         maxResults: 1,
+        prefix: `${requestId}/`,
     });
 
     return files.length > 0;
@@ -78,18 +78,12 @@ export const downloadOCRResults = async (requestId: string, options: DownloadOCR
     return results;
 };
 
-export const mapOCRDataToPages = async ({ directory, files, debug }: OCRDataToPagesParams): Promise<Page[]> => {
+export const mapOCRDataToPages = async ({ debug, directory, files }: OCRDataToPagesParams): Promise<Page[]> => {
     const pages: Page[] = [];
-    const filesToProcess = files || (await fs.readdir(directory)).map((file) => path.resolve(directory, file));
+    const filesToProcess = files || (await readOCRData(directory));
 
     for (const file of filesToProcess) {
-        const {
-            pages: rawPages,
-            text,
-        }: { pages: protos.google.cloud.documentai.v1beta3.Document.IPage[]; text: string } = JSON.parse(
-            await fs.readFile(file, 'utf-8'),
-        );
-
+        const { pages: rawPages, text } = await readRawFile(file);
         pages.push(...rawPages.map((rawPage) => mapDocumentToPage(rawPage, text, debug)));
     }
 

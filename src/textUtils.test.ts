@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import { describe, expect, it } from 'vitest';
 
+import { readRawFile } from './io';
 import { mapDocumentToPage, stringToHash } from './textUtils';
 
 describe('textUtils', () => {
@@ -78,6 +79,13 @@ describe('textUtils', () => {
 
             expect(lines[0]).toContain('۲۹۳۳- حدثنا علي بن عيسى ثنا إبراهيم بن أبي طالب ثنا ابن أبي عمر ثنا سفيان عن');
             expect(lines.at(-1)).toContain('(1) لجأتم. (مصححه ) ');
+        });
+
+        it('should not break it up', async () => {
+            const rawFile = await readRawFile('testing/1.json');
+            const result = mapDocumentToPage(rawFile.pages[0], rawFile.text);
+
+            expect(result.text.endsWith('وإخلاصهم.')).toBe(true);
         });
     });
 });
